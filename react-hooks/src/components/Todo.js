@@ -11,7 +11,7 @@ const Todo = () => {
     getTodos();
 
     return () => {
-      console.log("clean up.");
+      console.log("clean up: remove mousemove event.");
     };
   }, []);
 
