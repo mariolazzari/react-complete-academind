@@ -1,10 +1,35 @@
-import React, { Fragment, useState, useEffect } from "react";
+import React, {
+  Fragment,
+  useState,
+  useEffect,
+  useReducer,
+  useRef
+} from "react";
 import axios from "axios";
+
+// todo reducer
+const todoReducer = (state, action) => {
+  switch (action.type) {
+    case "SET":
+      return action.payload;
+
+    case "ADD":
+      return [action.payload, ...state];
+
+    case "REMOVE":
+      return state.filter(todo => todo.id !== action.payload);
+
+    default:
+      return state;
+  }
+};
 
 const Todo = () => {
   // const [state, setState] = useState({ todo: "", todos: [] });
   const [todo, setTodo] = useState({ title: "" });
-  const [todos, setTodos] = useState([]);
+  //const [todos, setTodos] = useState([]);
+
+  // const todoInputRef = useRef();
 
   // fetch todos
   useEffect(() => {
@@ -26,13 +51,16 @@ const Todo = () => {
     };
   }, []);
 
+  const [todoList, dispatch] = useReducer(todoReducer, []);
+
   // load todos
   const getTodos = async () => {
     try {
       const { data } = await axios.get(
         "https://jsonplaceholder.typicode.com/todos"
       );
-      setTodos(data);
+      //      setTodos(data);
+      dispatch({ type: "SET", payload: data });
     } catch (error) {
       console.log(error);
     }
@@ -43,13 +71,20 @@ const Todo = () => {
   //const onChange = e => setState({ ...state, todo: e.target.value });
   const addTodo = async () => {
     try {
-      setTodos([todo, ...todos]);
+      //setTodos([todo, ...todos]);
       await axios.post("https://jsonplaceholder.typicode.com/todos", { todo });
+      dispatch({ type: "ADD", payload: todo });
     } catch (error) {
       console.log(error);
     }
   };
   //const addTodo = () => setState({ ...state, todos: [...todos, todo] });
+
+  // remove item
+  const removeTodo = id => {
+    axios.delete("https://jsonplaceholder.typicode.com/todos/" + id);
+    dispatch({ type: "REMOVE", payload: id });
+  };
 
   return (
     <Fragment>
@@ -58,11 +93,14 @@ const Todo = () => {
         placeholder="Todo..."
         value={todo.title}
         onChange={onChange}
+        //ref={todoInputRef}
       />
       <button onClick={addTodo}>Add</button>
       <ul>
-        {todos.map((todo, i) => (
-          <li key={i}>{todo.title}</li>
+        {todoList.map(todo => (
+          <li key={todo.id} onClick={() => removeTodo(todo.id)}>
+            {todo.title}
+          </li>
         ))}
       </ul>
     </Fragment>
