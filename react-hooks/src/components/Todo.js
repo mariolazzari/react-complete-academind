@@ -6,6 +6,7 @@ import React, {
   useRef
 } from "react";
 import axios from "axios";
+import { useFormInput } from "../hooks/forms";
 
 // todo reducer
 const todoReducer = (state, action) => {
@@ -28,6 +29,7 @@ const Todo = () => {
   // const [state, setState] = useState({ todo: "", todos: [] });
   const [todo, setTodo] = useState({ title: "" });
   //const [todos, setTodos] = useState([]);
+  const todoInput = useFormInput();
 
   // const todoInputRef = useRef();
 
